@@ -1,50 +1,34 @@
 cubes = {
-    0: {
-        y: {
-            x: c
-            for x, c in enumerate(line)
-        }
-        for y, line in enumerate(open("input").read().strip().split("\n"))
-    }
+    (x, y, 0): c
+    for y, line in enumerate(open("input").read().strip().split("\n"))
+    for x, c in enumerate(line)
 }
 
-
 def set_range():
-    global xr, yr, zr
+    global mins, maxs
 
-    zs = cubes.keys()
-    ys = {y for plane in cubes.values() for y in plane.keys()}
-    xs = {x for plane in cubes.values() for line in plane.values() for x in line.keys()}
+    keys = cubes.keys()
 
-    xr = (min(xs), max(xs)+1)
-    yr = (min(ys), max(ys)+1)
-    zr = (min(zs), max(zs)+1)
+    xs = {key[0] for key in keys}
+    ys = {key[1] for key in keys}
+    zs = {key[2] for key in keys}
+
+    mins=(min(xs), min(ys), min(zs))
+    maxs=(max(xs)+1, max(ys)+1, max(zs)+1)
 
 def get(x, y, z):
-    return cubes.get(z, {}).get(y, {}).get(x, ".")
-
-def set(data, x, y, z, value):
-    if z not in data:
-        data[z] = {}
-
-    if y not in data[z]:
-        data[z][y] = {}
-
-    data[z][y][x] = value
+    return cubes.get((x, y, z), ".")
 
 def output():
-    for z in range(zr[0], zr[1]):
+    for z in range(mins[2], maxs[2]):
         print(f"z={z}")
-        for y in range(yr[0], yr[1]):
-            print("".join([
+        for y in range(mins[1], maxs[1]):
+            print("".join(
                 get(x, y, z)
-                for x in range(xr[0], xr[1])
-            ]))
+                for x in range(mins[0], maxs[0])
+            ))
         print()
     print()
-
-set_range()
-output()
 
 def active_neighbours(x, y, z):
     return len([
@@ -53,25 +37,28 @@ def active_neighbours(x, y, z):
         for iy in range(y-1, y+2)
         for ix in range(x-1, x+2)
         if iz != z or iy != y or ix != x
-        if get(ix, iy, iz) == "#"
+        if cubes.get((ix, iy, iz)) == "#"
     ])
 
 def cycle():
     global cubes, zr, yr, xr
+
+    set_range()
+
     result = {}
 
-    for z in range(zr[0]-1, zr[1]+1):
-        for y in range(yr[0]-1, yr[1]+1):
-            for x in range(xr[0]-1, xr[1]+1):
+    for z in range(mins[2]-1, maxs[2]+1):
+        for y in range(mins[1]-1, maxs[1]+1):
+            for x in range(mins[0]-1, maxs[0]+1):
                 n = active_neighbours(x, y, z)
-                c = get(x, y, z)
+                c = cubes.get((x, y, z), ".")
 
                 if c == "#" and n not in (2, 3):
-                    set(result, x, y, z, ".")
+                    c = "."
                 elif c == "." and n == 3:
-                    set(result, x, y, z, "#")
-                else:
-                    set(result, x, y, z, c)
+                    c = "#"
+
+                result[(x, y, z)] = c
 
     cubes = result
 
@@ -80,4 +67,4 @@ def cycle():
 for i in range(6):
     cycle()
 
-print(len([c for plane in cubes.values() for line in plane.values() for c in line.values() if c == "#"]))
+print(len([c for c in cubes.values() if c == "#"]))
