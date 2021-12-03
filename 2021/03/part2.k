@@ -14,18 +14,12 @@ iter: {[f;t]
     n:: n+1;
     t[&{x[n]=e[n]}'t]}
 
-n: -1
-e: ()
-ox: {1<#x}iter[epsilon]/input
-ox: bin2dec[ox[0]]
-ox
+calc: {[f;t]
+    n:: -1;
+    e:: ();
+    out: {1<#x}iter[f]/t;
+    bin2dec[out[0]]}
 
-n: -1
-e: ()
-co: {1<#x}iter[gamma]/input
-co: bin2dec[co[0]]
-co
-
-ox * co
+calc[epsilon;input] * calc[gamma;input]
 
 \\
