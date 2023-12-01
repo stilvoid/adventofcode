@@ -3,7 +3,7 @@
         while line
         collect line)))
 
-(defvar nums '(
+(defvar terms '(
     ("one" . 1)
     ("two" . 2)
     ("three" . 3)
@@ -12,23 +12,28 @@
     ("six" . 6)
     ("seven" . 7)
     ("eight" . 8)
-    ("nine" . 9)))
+    ("nine" . 9)
+    ("0" . 0)
+    ("1" . 1)
+    ("2" . 2)
+    ("3" . 3)
+    ("4" . 4)
+    ("5" . 5)
+    ("6" . 6)
+    ("7" . 7)
+    ("8" . 8)
+    ("9" . 9)))
 
-(defun getnums (text)
-  (loop for num in nums
-    when (and (>= (length text) (length (car num)))
-        (equal (car num) (subseq text 0 (length (car num)))))
-    return (cdr num)))
+(defun find-from-left (text)
+  (loop for term in terms
+    do (if (equal 0 (search (car term) text)) (return (cdr term)))))
 
-(defun getdigits (text)
-  (loop for x from 0 to (- (length text) 1)
-    collect (if (digit-char-p (elt text x))
-      (parse-integer (format nil "~c" (elt text x)))
-      (getnums (subseq text x)))))
+(defun find-all-from-left (text)
+  (remove nil
+    (loop for i from 0 to (- (length text) 1)
+      collect (find-from-left (subseq text i)))))
 
-(defun parse (text)
-  (let ((digits (remove nil (getdigits text))))
-    (+ (* (car digits) 10) (car (last digits)))))
+(defun first-and-last (nums)
+  (+ (* 10 (car nums)) (car (last nums))))
 
-(print (apply #'+ (loop for text in input
-    collect (parse text))))
+(print (apply '+ (loop for row in input collect (first-and-last (find-all-from-left row)))))
