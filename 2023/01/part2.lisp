@@ -4,21 +4,21 @@
         collect line)))
 
 (defvar nums '(
-    ("one" 1)
-    ("two" 2)
-    ("three" 3)
-    ("four" 4)
-    ("five" 5)
-    ("six" 6)
-    ("seven" 7)
-    ("eight" 8)
-    ("nine" 9)))
+    ("one" . 1)
+    ("two" . 2)
+    ("three" . 3)
+    ("four" . 4)
+    ("five" . 5)
+    ("six" . 6)
+    ("seven" . 7)
+    ("eight" . 8)
+    ("nine" . 9)))
 
 (defun getnums (text)
-  (car (loop for num in nums
+  (loop for num in nums
     when (and (>= (length text) (length (car num)))
         (equal (car num) (subseq text 0 (length (car num)))))
-    return (cdr num))))
+    return (cdr num)))
 
 (defun getdigits (text)
   (loop for x from 0 to (- (length text) 1)
